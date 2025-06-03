@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChefBot食譜機器人</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+      position: relative;
+      overflow-y: auto;
+    }
+    .container {
+      display: flex;
+      flex: 1;
+      width: 100%;
+    }
+    .left {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .left img {
+      max-width: 80%;
+      max-height: 80%;
+      opacity: 0.6;
+    }
+    .right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-top: 80px;
+    }
+    .header {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-family: 'Pacifico', cursive;
+      font-size: 36px;
+      color: #ff6f61;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      letter-spacing: 2px;
+    }
+    h1 {
+      text-align: center;
+    }
+    #qrImage {
+      max-width: 400px;
+      max-height: 300px;
+      margin-top: 20px;
+    }
+    .intro {
+      font-size: 16px;
+      color: #333;
+      text-align: center;
+      margin: 20px 0;
+      max-width: 500px;
+    }
+    .description {
+      font-size: 16px;
+      color: #555;
+      text-align: center;
+      margin: 20px 0;
+    }
+    .footer {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 18px;
+      color: #333;
+      text-align: center;
+      padding: 10px;
+      width: 100%;
+    }
+    .button-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 15px;
+      padding-right: 10px;
+      min-width: 200px;
+    }
+    .about-button, .example-button, .back-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      position: relative;
+      z-index: 2;
+      white-space: nowrap;
+      max-width: 120px;
+      min-width: 80px;
+      min-height: 40px;
+    }
+    .about-button:hover, .example-button:hover, .back-button:hover {
+      background-color: #218838;
+    }
+    .page {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+      background-color: rgba(230, 230, 230, 0.5);
+    }
+    .page.active {
+      display: flex;
+    }
+    .example-content, .about-content {
+      display: flex;
+      flex: 1;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+    .about-left {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .about-right {
+      flex: 1;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .about-gif {
+      max-width: 90%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 10px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3; /* GIF layer on top */
+    }
+    .about-image {
+      width: 3000px;
+      height: 1000px;
+      object-fit: contain;
+      border-radius: 10px;
+      opacity: 0.5;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1; /* Static image at the bottom */
+    }
+    .developers {
+      font-size: 18px;
+      color: #555;
+      line-height: 1.5;
+      position: absolute;
+      top: 50%;
+      left: 55%;
+      transform: translateY(-50%);
+      z-index: 2; /* Developers text in the middle */
+      background-color: rgba(255, 255, 255, 0.7);
+      padding: 15px; /* Increased padding for better spacing */
+      border-radius: 5px;
+      width: 300px; /* Increased width for the developers block */
+    }
+    .developers a {
+      color: #333;
+      text-decoration: underline;
+      transition: color 0.3s;
+    }
+    .developers a:hover {
+      color: #ff6f61;
+    }
+    .back-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      min-width: 80px;
+      min-height: 40px;
+    }
+    .about-header {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      color: #333;
+      font-weight: bold;
+    }
+    .example-image {
+      max-width: 90%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 10px;
+      opacity: 0.5;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .example-text {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">ChefBot: Deal ur meal</div>
+  <div class="button-container">
+    <button class="about-button" onclick="showPage('about')">About Us</button>
+    <button class="example-button" onclick="showPage('example')">Example</button>
+  </div>
+
+  <!-- Main Page -->
+  <div id="main" class="page container active">
+    <div class="left">
+      <img src="https://i.imgur.com/4iw17WK.png" alt="Chef Image">
+    </div>
+    <div class="right">
+      <h1>Not Sure What to Cook? Too Many Flavors to Choose From?</h1>
+      <div class="intro">
+        Chef Bot: Your Cooking Assistant!<br>
+        Get the perfect recipe based on your mood and today's weather!<br>
+        We bring you the most unique features!
+      </div>
+      <div class="description">
+        let's try Chef Bot to your daily cooking more funny!<br>
+      </div>
+      <img id="qrImage" src="https://i.imgur.com/LU35DC5.png" alt="QR Code Image">
+      <div class="description">
+        Scan the QR Code above to join us!
+      </div>
+    </div>
+  </div>
+
+  <!-- About Us Page -->
+  <div id="about" class="page">
+    <div class="about-header">About Us</div>
+    <button class="back-button" onclick="showPage('main')">Back</button>
+    <div class="about-content">
+      <div class="about-left">
+        <img class="about-gif" src="https://imgur.com/cZeXPtO.gif" alt="About GIF">
+      </div>
+      <div class="about-right">
+        <div class="developers">
+          Developers:<br>
+          <a href="https://1f0a0c5h.github.io/" target="_blank">Face, National Taipei University</a><br>
+          <a href="https://james12004.github.io/" target="_blank">James, National Taipei University</a>
+        </div>
+        <img class="about-image" src="https://lh4.googleusercontent.com/PDYQq_rJ0tAvTEAyD0Bcjh07oeSXPm74YkLQCmWqCSn0v9qp470qnvRX1ipZ53qXD0MS94K7dmpshden6kOg6wYUXWKE41-9QtF3VTUo3vUkz71UItiC_Kzuakthgksfz_hHEtVD" alt="About Us Image">
+      </div>
+    </div>
+  </div>
+
+  <!-- Example Page -->
+  <div id="example" class="page">
+    <button class="back-button" onclick="showPage('main')">Back</button>
+    <div class="example-content">
+      <div class="example-text">
+        <h1>Example Page</h1>
+        <p>This is an example page for ChefBot.</p>
+      </div>
+      <img class="example-image" src="https://imgur.com/mcitNnX.png" alt="Example Image">
+    </div>
+  </div>
+
+  <div class="footer">Graduate Institute of Information Management, National Taipei University</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <script>
+    const resultDiv = document.getElementById("result");
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      document.getElementById(pageId).classList.add('active');
+      const header = document.querySelector('.header');
+      const buttonContainer = document.querySelector('.button-container');
+      if (pageId === 'main') {
+        header.style.display = 'block';
+        buttonContainer.style.display = 'flex';
+      } else {
+        header.style.display = 'none';
+        buttonContainer.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
